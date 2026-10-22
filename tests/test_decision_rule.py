@@ -2,7 +2,9 @@
 
 The authors' probabilities_to_decision.py (texture-vs-shape, pinned commit)
 is downloaded with the stimuli into data/ and imported from there; it is not
-part of this repository because that code carries no licence.
+part of this repository because that code carries no licence. Their class
+takes the aggregation as an argument (default np.mean), so both rules are
+checked against it.
 """
 
 import sys
@@ -16,7 +18,7 @@ AUTHORS_CODE = data.SOURCE_DIR / "code"
 
 
 @pytest.fixture(scope="module")
-def authors_mapping():
+def authors_module():
     data.download()
     # Their module imports "helper.human_categories", relative to code/.
     sys.path.insert(0, str(AUTHORS_CODE))
@@ -24,7 +26,12 @@ def authors_mapping():
         import probabilities_to_decision as ptd
     finally:
         sys.path.remove(str(AUTHORS_CODE))
-    return ptd.ImageNetProbabilitiesTo16ClassesMapping()
+    return ptd
+
+
+def authors_mapping(module, how):
+    return module.ImageNetProbabilitiesTo16ClassesMapping(
+        aggregation_function=categories.AGGREGATIONS[how])
 
 
 def random_softmax(rng, n, concentration):
@@ -34,39 +41,54 @@ def random_softmax(rng, n, concentration):
     return rng.dirichlet(np.full(1000, concentration), size=n)
 
 
+@pytest.mark.parametrize("how", ["mean", "max"])
 @pytest.mark.parametrize("concentration", [0.01, 0.1, 1.0, 100.0])
-def test_matches_authors_on_random_inputs(authors_mapping, concentration):
+def test_matches_authors_on_random_inputs(authors_module, how, concentration):
+    mapping = authors_mapping(authors_module, how)
     rng = np.random.default_rng(0)
     probs = random_softmax(rng, 2000, concentration)
-    ours = categories.decide(probs)
-    theirs = [authors_mapping.probabilities_to_decision(p) for p in probs]
+    ours = categories.decide(probs, how)
+    theirs = [mapping.probabilities_to_decision(p) for p in probs]
     assert ours == theirs
 
 
-def test_matches_authors_on_model_outputs(authors_mapping):
+def test_default_is_mean(authors_module):
+    """With no argument, both functions use the mean."""
+    rng = np.random.default_rng(1)
+    probs = random_softmax(rng, 500, 0.1)
+    mapping = authors_module.ImageNetProbabilitiesTo16ClassesMapping()
+    assert categories.decide(probs) == categories.decide(probs, "mean") \
+        == [mapping.probabilities_to_decision(p) for p in probs]
+
+
+@pytest.mark.parametrize("how", ["mean", "max"])
+def test_matches_authors_on_model_outputs(authors_module, how):
     """The real softmax outputs, if reproduce has cached them."""
     caches = sorted((data.DATA_DIR / "softmax").glob("*.npy"))
     if not caches:
         pytest.skip("run python -m shapebias.reproduce first")
+    mapping = authors_mapping(authors_module, how)
     for cache in caches:
         probs = np.load(cache)
-        theirs = [authors_mapping.probabilities_to_decision(p) for p in probs]
-        assert categories.decide(probs) == theirs, cache.name
+        theirs = [mapping.probabilities_to_decision(p) for p in probs]
+        assert categories.decide(probs, how) == theirs, cache.name
 
 
-def test_ties_go_to_the_first_category(authors_mapping):
-    """With every probability equal, all 16 means tie and both rules must pick
-    the alphabetically first category.
+@pytest.mark.parametrize("how", ["mean", "max"])
+def test_ties_go_to_the_first_category(authors_module, how):
+    """With every probability equal, all 16 scores tie and both rules must
+    pick the alphabetically first category.
 
     2**-10 rather than 1/1000: a power of two is stored exactly, so every
     category mean is exactly equal. With 1/1000, rounding inside np.mean makes
     the means differ in the last bit and "dog" wins (both rules agree on that
     too, but it is no longer a tie)."""
     probs = np.full((1, 1000), 2.0 ** -10)
-    assert categories.decide(probs) == [authors_mapping.probabilities_to_decision(probs[0])] == ["airplane"]
+    theirs = authors_mapping(authors_module, how).probabilities_to_decision(probs[0])
+    assert categories.decide(probs, how) == [theirs] == ["airplane"]
 
 
-def test_index_lists_match_authors(authors_mapping):
+def test_index_lists_match_authors(authors_module):
     import helper.human_categories as hc  # cached by the fixture's import
     c = hc.HumanCategories()
     for name in categories.CATEGORIES:

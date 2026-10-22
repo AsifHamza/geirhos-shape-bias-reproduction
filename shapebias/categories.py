@@ -52,23 +52,28 @@ CATEGORY_INDICES = {
 # authors' loop keeps the first category that reaches the maximum (strict ">").
 CATEGORIES = sorted(CATEGORY_INDICES)
 
+# How the probabilities inside one category are combined into one score.
+# "mean" is the default of the authors' published function
+# (aggregation_function=np.mean, in both texture-vs-shape and model-vs-human).
+# "max" takes the most probable ImageNet class inside the category, so the
+# decision is the category of the top-1 class among the 207 listed.
+AGGREGATIONS = {"mean": np.mean, "max": np.max}
 
-def aggregate(probabilities):
-    """Average the probabilities inside each category.
+
+def aggregate(probabilities, how="mean"):
+    """Combine the probabilities inside each category into one score.
 
     probabilities: array of shape (n_images, 1000), softmax outputs.
+    how: "mean" or "max", see AGGREGATIONS.
     Returns an array of shape (n_images, 16), columns in CATEGORIES order.
-
-    The mean, not the sum, is what the authors use (aggregation_function
-    defaults to np.mean). With the mean, dog (109 classes) is not favoured over
-    knife (1 class) just for having more classes.
     """
+    function = AGGREGATIONS[how]
     probabilities = np.asarray(probabilities)
-    columns = [probabilities[:, CATEGORY_INDICES[c]].mean(axis=1) for c in CATEGORIES]
+    columns = [function(probabilities[:, CATEGORY_INDICES[c]], axis=1) for c in CATEGORIES]
     return np.stack(columns, axis=1)
 
 
-def decide(probabilities):
+def decide(probabilities, how="mean"):
     """Return the 16-class decision (a category name) for each image."""
-    scores = aggregate(probabilities)
+    scores = aggregate(probabilities, how)
     return [CATEGORIES[i] for i in scores.argmax(axis=1)]
