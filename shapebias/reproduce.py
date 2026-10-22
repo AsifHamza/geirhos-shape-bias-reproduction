@@ -120,6 +120,24 @@ def main():
               ["model", "ours_no_resize", "ours_resize256_crop224", "agreement_with_released"],
               ablation_rows)
 
+    # Mean against max: the published function's default against the rule that
+    # reproduces the released decisions.
+    aggregation_rows = []
+    for name in models.MODELS:
+        probs = softmax_for(name, paths)
+        released = paper.read_decisions(paper.PAPER_MODEL_FILES[name])
+        row = [name, paper.PAPER_SHAPE_BIAS[name]]
+        for how in categories.AGGREGATIONS:
+            decisions = categories.decide(probs, how)
+            agree = np.mean([d == released[n] for d, n, c in zip(decisions, names, conflict) if c])
+            row += [fmt(metrics.summary(shapes, textures, decisions)["shape_bias"]), fmt(agree)]
+        aggregation_rows.append(row)
+    write_csv(RESULTS / "aggregation_mean_vs_max.csv",
+              ["model", "paper_figure4"]
+              + [f"{how}_{col}" for how in categories.AGGREGATIONS
+                 for col in ("shape_bias", "agreement_with_released")],
+              aggregation_rows)
+
     plots.figure4(ours, theirs, human_summary, RESULTS / "figure4_reproduction.png")
 
     widths = [max(len(str(r[i])) for r in [header] + summary_rows) for i in range(len(header))]

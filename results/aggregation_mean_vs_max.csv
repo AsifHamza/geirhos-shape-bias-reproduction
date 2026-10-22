@@ -1,0 +1,5 @@
+model,paper_figure4,mean_shape_bias,mean_agreement_with_released,max_shape_bias,max_agreement_with_released
+alexnet,0.429,0.2394,0.4983,0.2531,0.5117
+vgg16,0.172,0.0795,0.6125,0.0921,0.6517
+googlenet,0.312,0.2327,0.5400,0.2447,0.5475
+resnet50,0.221,0.2139,0.8458,0.2207,1.0000

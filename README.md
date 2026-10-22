@@ -35,6 +35,7 @@ checks the decision rule against the authors' code with both aggregations, check
 - `results/summary.csv`: per network, the paper's number, the number recomputed from the authors' released decisions, ours, our shape, texture and "neither" fractions, the released "neither" fraction, a probability-weighted shape bias, and the image-by-image agreement with the paper's network.
 - `results/per_category_shape_bias.csv`: shape bias per shape category, ours and released.
 - `results/ablation_resize_crop.csv`: shape bias when the usual resize-256, centre-crop-224 evaluation transform is applied first.
+- `results/aggregation_mean_vs_max.csv`: shape bias and agreement with the released decisions under each aggregation, mean (the published function's default) and max (used for every other result).
 - `results/figure4_reproduction.png`: Figure 4 redrawn, ours next to the released decisions.
 - `results/decisions_<network>.csv`: per image, our decision, the paper's decision and the 16 category scores.
 
