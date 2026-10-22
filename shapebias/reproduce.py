@@ -15,6 +15,12 @@ from . import categories, data, metrics, models, paper, plots
 RESULTS = Path(__file__).resolve().parent.parent / "results"
 SOFTMAX_DIR = data.DATA_DIR / "softmax"
 
+# The aggregation that reproduces the paper's released decisions: with "max",
+# torchvision ResNet-50 (the same weights as the paper's) gives the paper's
+# decision on all 1,280 images. The authors' published function defaults to
+# "mean", which does not (see the README).
+AGGREGATION = "max"
+
 
 def softmax_for(name, paths, variant=""):
     """Softmax outputs for one model; variant "" is the main run and
@@ -61,8 +67,8 @@ def main():
     ours, theirs, summary_rows = {}, {}, []
     for name in models.MODELS:
         probs = softmax_for(name, paths)
-        scores = categories.aggregate(probs)
-        decisions = categories.decide(probs)
+        scores = categories.aggregate(probs, AGGREGATION)
+        decisions = categories.decide(probs, AGGREGATION)
         ours[name] = metrics.summary(shapes, textures, decisions)
         weighted = metrics.weighted_shape_bias(shapes, textures, scores)
 
@@ -104,7 +110,7 @@ def main():
     # Ablation: the same networks with resize-256 and centre-crop-224 first.
     ablation_rows = []
     for name in models.MODELS:
-        decisions = categories.decide(softmax_for(name, paths, "resize_crop"))
+        decisions = categories.decide(softmax_for(name, paths, "resize_crop"), AGGREGATION)
         released = paper.read_decisions(paper.PAPER_MODEL_FILES[name])
         agree = np.mean([d == released[n] for d, n, c in zip(decisions, names, conflict) if c])
         ablation_rows.append([name, fmt(ours[name]["shape_bias"]),

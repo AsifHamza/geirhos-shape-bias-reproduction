@@ -12,6 +12,8 @@ The pipeline is my own code: loading the stimuli, the forward passes, the 1,000-
 
 All four networks are torchvision's original ImageNet weights (`IMAGENET1K_V1`), run on the CPU. The paper used Caffe weights for AlexNet, VGG-16 and GoogLeNet, and torchvision for ResNet-50.
 
+The decision rule takes, for each of the 16 categories, the largest softmax probability among that category's ImageNet classes, and picks the category with the largest value. The authors' published function averages instead (`aggregation_function=np.mean` by default), but the mean does not reproduce their released decisions: for torchvision ResNet-50, the paper's own network, the max gives the released decision on all 1,280 images and the mean on 85% of the 1,200 conflict images. The max also reproduces the torchvision AlexNet and VGG-16 figures in the texture-vs-shape README (25.3% and 9.2%). The rule is set by `AGGREGATION` in `shapebias/reproduce.py`.
+
 ## Re-running
 
 ```
@@ -26,7 +28,7 @@ This downloads the stimuli and the authors' released per-image decisions from co
 python -m pytest
 ```
 
-checks the decision rule against the authors' code and checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly.
+checks the decision rule against the authors' code with both aggregations, checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly, and checks that max aggregation on ResNet-50 gives the released decisions.
 
 ## Outputs
 

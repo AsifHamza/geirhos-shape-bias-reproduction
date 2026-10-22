@@ -37,3 +37,22 @@ def test_released_humans_give_figure4(stimuli):
     bias = metrics.summary(shapes * 10, textures * 10,
                            [h[n] for h in humans for n in names])["shape_bias"]
     assert round(bias, 3) == paper.PAPER_SHAPE_BIAS["humans"]
+
+
+def test_max_reproduces_released_resnet50(stimuli):
+    """ResNet-50 is the one network whose weights are the paper's own
+    (torchvision). With max aggregation, our decisions equal the released ones
+    on every image; with mean they do not."""
+    import numpy as np
+
+    from shapebias import categories
+
+    cache = data.DATA_DIR / "softmax" / "resnet50.npy"
+    if not cache.exists():
+        pytest.skip("run python -m shapebias.reproduce first")
+    names, _, _ = stimuli
+    released = paper.read_decisions(paper.PAPER_MODEL_FILES["resnet50"])
+    released = [released[n] for n in names]
+    probs = np.load(cache)
+    assert categories.decide(probs, "max") == released
+    assert categories.decide(probs, "mean") != released
