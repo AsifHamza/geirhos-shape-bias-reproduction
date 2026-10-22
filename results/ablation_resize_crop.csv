@@ -1,0 +1,5 @@
+model,ours_no_resize,ours_resize256_crop224,agreement_with_released
+alexnet,0.2394,0.2639,0.5017
+vgg16,0.0795,0.1075,0.6067
+googlenet,0.2327,0.2509,0.5267
+resnet50,0.2139,0.2221,0.7133

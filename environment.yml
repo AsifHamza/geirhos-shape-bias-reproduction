@@ -1,0 +1,12 @@
+name: shape-bias
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12.15
+  - pytorch=2.14.1
+  - torchvision=0.29.1
+  - numpy=2.5.4
+  - pillow=13.0.0
+  - matplotlib=3.11.2
+  - pytest=9.1.1

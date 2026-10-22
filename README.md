@@ -1,0 +1,50 @@
+# Reproducing the texture bias of ImageNet CNNs (Geirhos et al., ICLR 2019)
+
+## The claim
+
+"A pretrained classifier follows texture over shape on cue-conflict images": Figure 4 of R. Geirhos, P. Rubisch, C. Michaelis, M. Bethge, F. A. Wichmann and W. Brendel, *ImageNet-trained CNNs are biased towards texture; increasing shape bias improves accuracy and robustness*, ICLR 2019. On the 1,280 released cue-conflict images the paper reports a shape bias of 42.9% for AlexNet, 17.2% for VGG-16, 31.2% for GoogLeNet and 22.1% for ResNet-50, against 95.9% for humans.
+
+Shape bias is the fraction of shape decisions among the decisions that name either the shape or the texture category, over the 1,200 images whose shape and texture differ.
+
+## Route
+
+The pipeline is my own code: loading the stimuli, the forward passes, the 1,000-to-16 class decision rule, the metric and the figure. The 16 lists of ImageNet indices are copied from the authors' MIT-licensed [model-vs-human](https://github.com/bethgelab/model-vs-human) (see `LICENSES/`). The authors' own decision function from [texture-vs-shape](https://github.com/rgeirhos/texture-vs-shape) is downloaded at run time and used only by the tests, to check that my rule gives the same decision on every input.
+
+All four networks are torchvision's original ImageNet weights (`IMAGENET1K_V1`), run on the CPU. The paper used Caffe weights for AlexNet, VGG-16 and GoogLeNet, and torchvision for ResNet-50.
+
+## Re-running
+
+```
+conda env create -f environment.yml
+conda activate shape-bias
+python -m shapebias.reproduce
+```
+
+This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept; the stimuli are checked against a SHA-256), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about six minutes on a laptop CPU (an Apple M4 Pro). Then
+
+```
+python -m pytest
+```
+
+checks the decision rule against the authors' code and checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly.
+
+## Outputs
+
+- `results/summary.csv`: per network, the paper's number, the number recomputed from the authors' released decisions, ours, our shape, texture and "neither" fractions, the released "neither" fraction, a probability-weighted shape bias, and the image-by-image agreement with the paper's network.
+- `results/per_category_shape_bias.csv`: shape bias per shape category, ours and released.
+- `results/ablation_resize_crop.csv`: shape bias when the usual resize-256, centre-crop-224 evaluation transform is applied first.
+- `results/figure4_reproduction.png`: Figure 4 redrawn, ours next to the released decisions.
+- `results/decisions_<network>.csv`: per image, our decision, the paper's decision and the 16 category scores.
+
+## Layout
+
+- `shapebias/data.py`: download, checksum and filename parsing of the stimuli.
+- `shapebias/categories.py`: the 16 categories and the decision rule.
+- `shapebias/models.py`: the networks and preprocessing.
+- `shapebias/metrics.py`: shape bias, per-category values and the probability-weighted variant.
+- `shapebias/paper.py`: reading the authors' released decisions.
+- `shapebias/plots.py`, `shapebias/reproduce.py`: the figure and the one command.
+
+## Licences
+
+The stimuli and released decisions are by Geirhos et al. under CC BY 4.0 (texture-vs-shape `DATASET_LICENSE`, downloaded alongside them). The category index lists are from model-vs-human, MIT, copyright Robert Geirhos 2021.

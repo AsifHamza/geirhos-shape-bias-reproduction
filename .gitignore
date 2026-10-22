@@ -1,0 +1,9 @@
+# Downloaded stimuli, the authors' released files, and cached softmax outputs.
+# All are rebuilt by the one command.
+data/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.ipynb_checkpoints/
