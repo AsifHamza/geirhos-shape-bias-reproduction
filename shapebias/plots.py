@@ -52,3 +52,41 @@ def _draw(ours, theirs, humans, cats, y, path):
     fig.tight_layout(rect=(0, 0.07, 1, 1), w_pad=0.6)  # leave room for the legend
     fig.savefig(path, dpi=DPI)
     plt.close(fig)
+
+
+COLUMN_IN = 3.5  # one column of an IEEE two-column page
+
+
+def agreement_figure(variants, path):
+    """Image-by-image agreement with the paper's released decisions, one column wide.
+
+    variants: {"max" | "mean" | "resize_crop": {network: (shape bias, agreement)}},
+    where agreement is the fraction of the 1,200 conflict images on which our
+    network makes the same decision as the paper's. Within each row the three
+    variants are offset vertically so that close values stay visible."""
+    names = list(TITLES)[::-1]  # AlexNet at the top
+    rows = range(len(names))
+    series = [  # (variant, offset, style, label)
+        ("max", 0.2, dict(marker="D", s=22, color="#1f77b4"), "max (used)"),
+        ("mean", 0.0, dict(marker="D", s=22, facecolors="none", edgecolors="#1f77b4",
+                           linewidths=0.9), "mean (default)"),
+        ("resize_crop", -0.2, dict(marker="^", s=24, color="#888888"), "max + resize"),
+    ]
+    with plt.rc_context({"font.size": FONT_PT}):
+        fig, ax = plt.subplots(figsize=(COLUMN_IN, 2.2))
+        for key, offset, style, label in series:
+            ax.scatter([variants[key][n][1] for n in names], [i + offset for i in rows],
+                       label=label, zorder=3, **style)
+        for i in rows[:-1]:
+            ax.axhline(i + 0.5, color="black", lw=0.4, alpha=0.3)
+        ax.grid(axis="x", alpha=0.25)
+        ax.set_xlim(0.4, 1.03)
+        ax.set_xlabel("agreement with the paper's decisions")
+        ax.set_yticks(list(rows), [TITLES[n] for n in names])
+        ax.set_ylim(-0.5, len(names) - 0.5)
+        handles, labels = ax.get_legend_handles_labels()
+        fig.legend(handles, labels, loc="upper center", ncol=3, frameon=False,
+                   columnspacing=0.8, handletextpad=0.2)
+        fig.tight_layout(rect=(0, 0, 1, 0.88))  # leave room for the legend above
+        fig.savefig(path, dpi=DPI)
+        plt.close(fig)

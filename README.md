@@ -37,6 +37,7 @@ checks the decision rule against the authors' code with both aggregations, check
 - `results/ablation_resize_crop.csv`: shape bias when the usual resize-256, centre-crop-224 evaluation transform is applied first.
 - `results/aggregation_mean_vs_max.csv`: shape bias and agreement with the released decisions under each aggregation, mean (the published function's default) and max (used for every other result).
 - `results/figure4_reproduction.png`: Figure 4 redrawn, ours next to the released decisions.
+- `results/figure_agreement.png`: per network, the fraction of conflict images on which our decision equals the paper's released decision, with max aggregation, with mean aggregation, and with max after resize and crop.
 - `results/decisions_<network>.csv`: per image, our decision, the paper's decision and the 16 category scores.
 
 ## Layout

@@ -107,15 +107,18 @@ def main():
                + [fmt(theirs[m]["per_category_shape_bias"][c]) for m in models.MODELS]
                for c in categories.CATEGORIES])
 
+    # Shape bias and agreement per network under each variant, for the agreement figure.
+    variants = {"resize_crop": {}}
+
     # Ablation: the same networks with resize-256 and centre-crop-224 first.
     ablation_rows = []
     for name in models.MODELS:
         decisions = categories.decide(softmax_for(name, paths, "resize_crop"), AGGREGATION)
         released = paper.read_decisions(paper.PAPER_MODEL_FILES[name])
         agree = np.mean([d == released[n] for d, n, c in zip(decisions, names, conflict) if c])
-        ablation_rows.append([name, fmt(ours[name]["shape_bias"]),
-                              fmt(metrics.summary(shapes, textures, decisions)["shape_bias"]),
-                              fmt(agree)])
+        bias = metrics.summary(shapes, textures, decisions)["shape_bias"]
+        variants["resize_crop"][name] = (bias, agree)
+        ablation_rows.append([name, fmt(ours[name]["shape_bias"]), fmt(bias), fmt(agree)])
     write_csv(RESULTS / "ablation_resize_crop.csv",
               ["model", "ours_no_resize", "ours_resize256_crop224", "agreement_with_released"],
               ablation_rows)
@@ -130,7 +133,9 @@ def main():
         for how in categories.AGGREGATIONS:
             decisions = categories.decide(probs, how)
             agree = np.mean([d == released[n] for d, n, c in zip(decisions, names, conflict) if c])
-            row += [fmt(metrics.summary(shapes, textures, decisions)["shape_bias"]), fmt(agree)]
+            bias = metrics.summary(shapes, textures, decisions)["shape_bias"]
+            variants.setdefault(how, {})[name] = (bias, agree)
+            row += [fmt(bias), fmt(agree)]
         aggregation_rows.append(row)
     write_csv(RESULTS / "aggregation_mean_vs_max.csv",
               ["model", "paper_figure4"]
@@ -139,6 +144,7 @@ def main():
               aggregation_rows)
 
     plots.figure4(ours, theirs, human_summary, RESULTS / "figure4_reproduction.png")
+    plots.agreement_figure(variants, RESULTS / "figure_agreement.png")
 
     widths = [max(len(str(r[i])) for r in [header] + summary_rows) for i in range(len(header))]
     for r in [header] + summary_rows:
