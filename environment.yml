@@ -10,3 +10,5 @@ dependencies:
   - pillow=13.0.0
   - matplotlib=3.11.2
   - pytest=9.1.1
+  - ipykernel=7.4.0
+  - nbclient=0.8.0
