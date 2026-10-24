@@ -56,9 +56,9 @@ def weighted_shape_bias(shapes, textures, scores):
     """Probability-weighted shape bias, a number the paper does not report.
 
     scores: (n_images, 16) aggregated probabilities, columns in CATEGORIES
-    order (categories.aggregate, with the same aggregation as the decisions). Instead of counting only the winning
-    category, each conflict image contributes the score of its shape category
-    and of its texture category:
+    order (categories.aggregate, with the same aggregation as the decisions).
+    Instead of counting only the winning category, each conflict image
+    contributes the score of its shape category and of its texture category:
 
         sum over images of p_shape / sum over images of (p_shape + p_texture)
 

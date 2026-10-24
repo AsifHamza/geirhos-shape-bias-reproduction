@@ -27,7 +27,7 @@ SOURCE_DIR = DATA_DIR / "texture-vs-shape"
 STIMULI_DIR = SOURCE_DIR / "stimuli" / "style-transfer-preprocessed-512"
 
 # Paths inside the repository that the reproduction uses. Nothing else in the
-# 200 MB tarball is written to disk.
+# 163 MB tarball is written to disk.
 WANTED = (
     "DATASET_LICENSE",
     "stimuli/style-transfer-preprocessed-512/",
