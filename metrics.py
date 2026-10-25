@@ -41,8 +41,7 @@ def summary(shapes, textures, decisions):
     by_cat = fractions_by_category(shapes, textures, decisions)
     shape = np.mean([v[0] for v in by_cat.values()])
     texture = np.mean([v[1] for v in by_cat.values()])
-    per_category = {c: (v[0] / (v[0] + v[1]) if v[0] + v[1] > 0 else float("nan"))
-                    for c, v in by_cat.items()}
+    per_category = {c: v[0] / (v[0] + v[1]) for c, v in by_cat.items()}
     return {
         "shape_bias": shape / (shape + texture),
         "shape_fraction": shape,

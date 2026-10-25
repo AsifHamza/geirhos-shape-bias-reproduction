@@ -53,26 +53,12 @@ def test_matches_authors_on_random_inputs(authors_module, how, concentration):
     assert ours == theirs
 
 
-def test_default_is_mean(authors_module):
-    """With no argument, both functions use the mean."""
-    rng = np.random.default_rng(1)
-    probs = random_softmax(rng, 500, 0.1)
-    mapping = authors_module.ImageNetProbabilitiesTo16ClassesMapping()
-    assert categories.decide(probs) == categories.decide(probs, "mean") \
-        == [mapping.probabilities_to_decision(p) for p in probs]
-
-
 @pytest.mark.parametrize("how", ["mean", "max"])
-def test_matches_authors_on_model_outputs(authors_module, how):
-    """The real softmax outputs, if reproduce has cached them."""
-    caches = sorted((data.DATA_DIR / "softmax").glob("*.npy"))
-    if not caches:
-        pytest.skip("run python main.py first")
+def test_matches_authors_on_model_outputs(authors_module, how, resnet50_softmax):
+    """Real network outputs: ResNet-50 on all 1,280 stimuli."""
     mapping = authors_mapping(authors_module, how)
-    for cache in caches:
-        probs = np.load(cache)
-        theirs = [mapping.probabilities_to_decision(p) for p in probs]
-        assert categories.decide(probs, how) == theirs, cache.name
+    theirs = [mapping.probabilities_to_decision(p) for p in resnet50_softmax]
+    assert categories.decide(resnet50_softmax, how) == theirs
 
 
 @pytest.mark.parametrize("how", ["mean", "max"])

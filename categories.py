@@ -60,7 +60,7 @@ CATEGORIES = sorted(CATEGORY_INDICES)
 AGGREGATIONS = {"mean": np.mean, "max": np.max}
 
 
-def aggregate(probabilities, how="mean"):
+def aggregate(probabilities, how):
     """Combine the probabilities inside each category into one score.
 
     probabilities: array of shape (n_images, 1000), softmax outputs.
@@ -73,7 +73,7 @@ def aggregate(probabilities, how="mean"):
     return np.stack(columns, axis=1)
 
 
-def decide(probabilities, how="mean"):
+def decide(probabilities, how):
     """Return the 16-class decision (a category name) for each image."""
     scores = aggregate(probabilities, how)
     return [CATEGORIES[i] for i in scores.argmax(axis=1)]

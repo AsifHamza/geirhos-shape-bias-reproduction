@@ -1,8 +1,7 @@
 """The one command: python main.py
 
 Downloads the stimuli, runs the four networks, and writes every number and
-figure into results/. Softmax outputs are cached in data/softmax/, so a second
-run skips the forward passes; delete data/ to start from nothing.
+figure into results/.
 """
 
 import csv
@@ -18,27 +17,12 @@ import paper
 import plots
 
 RESULTS = Path(__file__).resolve().parent / "results"
-SOFTMAX_DIR = data.DATA_DIR / "softmax"
 
 # The aggregation that reproduces the paper's released decisions: with "max",
 # torchvision ResNet-50 (the same weights as the paper's) gives the paper's
 # decision on all 1,280 images. The authors' published function defaults to
 # "mean", which does not (see the README).
 AGGREGATION = "max"
-
-
-def softmax_for(name, paths, variant=""):
-    """Softmax outputs for one model; variant "" is the main run and
-    "resize_crop" the preprocessing ablation."""
-    cache = SOFTMAX_DIR / f"{name}{'_' + variant if variant else ''}.npy"
-    if cache.exists():
-        return np.load(cache)
-    print(f"Running {name} {variant} on {len(paths)} images (CPU)")
-    preprocess = models.PREPROCESS_RESIZE_CROP if variant == "resize_crop" else models.PREPROCESS
-    probs = models.softmax_outputs(models.load(name), paths, preprocess)
-    SOFTMAX_DIR.mkdir(parents=True, exist_ok=True)
-    np.save(cache, probs)
-    return probs
 
 
 def write_csv(path, header, rows):
@@ -69,9 +53,14 @@ def main():
     human_summary = metrics.summary(shapes * len(humans), textures * len(humans),
                                     [h[n] for h in humans for n in names])
 
+    # Each network is run once on all 1,280 images; the outputs are kept for
+    # the mean-against-max table below.
+    softmax = {}
     ours, theirs, summary_rows = {}, {}, []
     for name in models.MODELS:
-        probs = softmax_for(name, paths)
+        print(f"Running {name} on {len(paths)} images (CPU)")
+        probs = models.softmax_outputs(models.load(name), paths)
+        softmax[name] = probs
         scores = categories.aggregate(probs, AGGREGATION)
         decisions = categories.decide(probs, AGGREGATION)
         ours[name] = metrics.summary(shapes, textures, decisions)
@@ -118,7 +107,9 @@ def main():
     # Ablation: the same networks with resize-256 and centre-crop-224 first.
     ablation_rows = []
     for name in models.MODELS:
-        decisions = categories.decide(softmax_for(name, paths, "resize_crop"), AGGREGATION)
+        print(f"Running {name} with resize and crop")
+        probs = models.softmax_outputs(models.load(name), paths, models.PREPROCESS_RESIZE_CROP)
+        decisions = categories.decide(probs, AGGREGATION)
         released = paper.read_decisions(paper.PAPER_MODEL_FILES[name])
         agree = np.mean([d == released[n] for d, n, c in zip(decisions, names, conflict) if c])
         bias = metrics.summary(shapes, textures, decisions)["shape_bias"]
@@ -132,7 +123,7 @@ def main():
     # reproduces the released decisions.
     aggregation_rows = []
     for name in models.MODELS:
-        probs = softmax_for(name, paths)
+        probs = softmax[name]
         released = paper.read_decisions(paper.PAPER_MODEL_FILES[name])
         row = [name, paper.PAPER_SHAPE_BIAS[name]]
         for how in categories.AGGREGATIONS:
