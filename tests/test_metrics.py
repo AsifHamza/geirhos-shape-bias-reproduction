@@ -1,7 +1,8 @@
 """Check the shape-bias code against the paper's own numbers.
 
 Fed the authors' released per-image decisions, our metric must give exactly
-the values printed in Figure 4.
+the values printed in Figure 4. The last test checks that max aggregation on
+ResNet-50 reproduces the released decisions image by image.
 """
 
 import pytest

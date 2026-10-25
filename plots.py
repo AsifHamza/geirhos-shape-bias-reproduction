@@ -1,4 +1,5 @@
-"""Figure 4 of the paper, redrawn with our numbers next to the released ones."""
+"""The two figures: Figure 4 of the paper redrawn with our numbers next to the
+released ones, and the per-image agreement with the paper's decisions."""
 
 import matplotlib
 

@@ -8,7 +8,7 @@ Shape bias is the fraction of shape decisions among the decisions that name eith
 
 ## Route
 
-The pipeline is my own code: loading the stimuli, the forward passes, the 1,000-to-16 class decision rule, the metric and the figure. The 16 lists of ImageNet indices are copied from the authors' MIT-licensed [model-vs-human](https://github.com/bethgelab/model-vs-human) (see `LICENSES/`). The authors' own decision function from [texture-vs-shape](https://github.com/rgeirhos/texture-vs-shape) is downloaded at run time and used only by the tests, to check that my rule gives the same decision on every input.
+The pipeline is my own code: loading the stimuli, the forward passes, the 1,000-to-16 class decision rule, the metric and the figures. The 16 lists of ImageNet indices are copied from the authors' MIT-licensed [model-vs-human](https://github.com/bethgelab/model-vs-human) (see `LICENSES/`). The authors' own decision function from [texture-vs-shape](https://github.com/rgeirhos/texture-vs-shape) is downloaded at run time and used only by the tests, to check that my rule gives the same decision on every input.
 
 All four networks are torchvision's original ImageNet weights (`IMAGENET1K_V1`), run on the CPU. The paper used Caffe weights for AlexNet, VGG-16 and GoogLeNet, and torchvision for ResNet-50.
 
@@ -22,13 +22,13 @@ conda activate shape-bias
 python main.py
 ```
 
-This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept; the stimuli are checked against a SHA-256), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about six minutes on a laptop CPU (an Apple M4 Pro). Then
+This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept; the stimuli are checked against a SHA-256), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about five minutes on a laptop CPU (an Apple M4 Pro; 4 min 49 s and 5 min 26 s in the last two runs). Then
 
 ```
 python -m pytest
 ```
 
-checks the decision rule against the authors' code with both aggregations, checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly, and checks that max aggregation on ResNet-50 gives the released decisions.
+takes about 70 seconds (it runs ResNet-50 once itself), checks the decision rule against the authors' code with both aggregations, checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly, and checks that max aggregation on ResNet-50 gives the released decisions.
 
 ## Outputs
 
