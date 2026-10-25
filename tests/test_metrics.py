@@ -51,5 +51,5 @@ def test_max_reproduces_released_resnet50(stimuli, softmax):
     names, _, _ = stimuli
     released = paper.read_decisions(paper.PAPER_MODEL_FILES["resnet50"])
     released = [released[n] for n in names]
-    assert categories.decide(softmax["resnet50"], "max") == released
-    assert categories.decide(softmax["resnet50"], "mean") != released
+    assert categories.decide(softmax["resnet50", "main"], "max") == released
+    assert categories.decide(softmax["resnet50", "main"], "mean") != released
