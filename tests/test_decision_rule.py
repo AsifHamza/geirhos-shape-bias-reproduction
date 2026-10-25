@@ -54,11 +54,12 @@ def test_matches_authors_on_random_inputs(authors_module, how, concentration):
 
 
 @pytest.mark.parametrize("how", ["mean", "max"])
-def test_matches_authors_on_model_outputs(authors_module, how, resnet50_softmax):
-    """Real network outputs: ResNet-50 on all 1,280 stimuli."""
+def test_matches_authors_on_model_outputs(authors_module, how, softmax):
+    """Real network outputs: all four networks on all 1,280 stimuli."""
     mapping = authors_mapping(authors_module, how)
-    theirs = [mapping.probabilities_to_decision(p) for p in resnet50_softmax]
-    assert categories.decide(resnet50_softmax, how) == theirs
+    for name, probs in softmax.items():
+        theirs = [mapping.probabilities_to_decision(p) for p in probs]
+        assert categories.decide(probs, how) == theirs, name
 
 
 @pytest.mark.parametrize("how", ["mean", "max"])

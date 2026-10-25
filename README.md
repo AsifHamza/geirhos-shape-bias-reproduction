@@ -28,7 +28,7 @@ This downloads the stimuli and the authors' released per-image decisions from co
 python -m pytest
 ```
 
-takes about 70 seconds (it runs ResNet-50 once itself), checks the decision rule against the authors' code with both aggregations, checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly, and checks that max aggregation on ResNet-50 gives the released decisions.
+takes about two and a half minutes (it runs the four networks once itself), checks the decision rule against the authors' code with both aggregations, on random inputs and on all four networks' outputs, checks that the metric, fed the authors' released decisions, gives the Figure 4 numbers exactly, and checks that max aggregation on ResNet-50 gives the released decisions.
 
 ## Outputs
 

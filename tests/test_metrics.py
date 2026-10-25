@@ -42,7 +42,7 @@ def test_released_humans_give_figure4(stimuli):
     assert round(bias, 3) == paper.PAPER_SHAPE_BIAS["humans"]
 
 
-def test_max_reproduces_released_resnet50(stimuli, resnet50_softmax):
+def test_max_reproduces_released_resnet50(stimuli, softmax):
     """ResNet-50 is the one network whose weights are the paper's own
     (torchvision). With max aggregation, our decisions equal the released ones
     on every image; with mean they do not."""
@@ -51,5 +51,5 @@ def test_max_reproduces_released_resnet50(stimuli, resnet50_softmax):
     names, _, _ = stimuli
     released = paper.read_decisions(paper.PAPER_MODEL_FILES["resnet50"])
     released = [released[n] for n in names]
-    assert categories.decide(resnet50_softmax, "max") == released
-    assert categories.decide(resnet50_softmax, "mean") != released
+    assert categories.decide(softmax["resnet50"], "max") == released
+    assert categories.decide(softmax["resnet50"], "mean") != released
