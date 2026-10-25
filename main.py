@@ -1,4 +1,4 @@
-"""The one command: python -m shapebias.reproduce
+"""The one command: python main.py
 
 Downloads the stimuli, runs the four networks, and writes every number and
 figure into results/. Softmax outputs are cached in data/softmax/, so a second
@@ -10,9 +10,14 @@ from pathlib import Path
 
 import numpy as np
 
-from . import categories, data, metrics, models, paper, plots
+import categories
+import data
+import metrics
+import models
+import paper
+import plots
 
-RESULTS = Path(__file__).resolve().parent.parent / "results"
+RESULTS = Path(__file__).resolve().parent / "results"
 SOFTMAX_DIR = data.DATA_DIR / "softmax"
 
 # The aggregation that reproduces the paper's released decisions: with "max",

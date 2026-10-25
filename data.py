@@ -22,7 +22,7 @@ TARBALL_URL = f"https://codeload.github.com/rgeirhos/texture-vs-shape/tar.gz/{CO
 # this repository were produced from.
 STIMULI_SHA256 = "1a28def11ac5b4bc3264beb6cf8fbb22042b088d443be95cba28e5925725ab2a"
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR = Path(__file__).resolve().parent / "data"
 SOURCE_DIR = DATA_DIR / "texture-vs-shape"
 STIMULI_DIR = SOURCE_DIR / "stimuli" / "style-transfer-preprocessed-512"
 

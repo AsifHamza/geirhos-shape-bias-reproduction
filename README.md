@@ -12,14 +12,14 @@ The pipeline is my own code: loading the stimuli, the forward passes, the 1,000-
 
 All four networks are torchvision's original ImageNet weights (`IMAGENET1K_V1`), run on the CPU. The paper used Caffe weights for AlexNet, VGG-16 and GoogLeNet, and torchvision for ResNet-50.
 
-The decision rule takes, for each of the 16 categories, the largest softmax probability among that category's ImageNet classes, and picks the category with the largest value. The authors' published function averages instead (`aggregation_function=np.mean` by default), but the mean does not reproduce their released decisions: for torchvision ResNet-50, the paper's own network, the max gives the released decision on all 1,280 images and the mean on 85% of the 1,200 conflict images. The max also reproduces the torchvision AlexNet and VGG-16 figures in the texture-vs-shape README (25.3% and 9.2%). The authors' README acknowledges the difference without naming the rule: in its section on the Stylized-ImageNet models it says those values "are computed using a slightly different probability aggregation method as reported in the paper. We here used the average", and lists 21.39% for a standard ResNet-50, which is what the mean gives here. Their earlier paper ([Geirhos et al., NeurIPS 2018](https://arxiv.org/abs/1808.08750), updated appendix) used summation. No source states the max; it is identified by the exact match with the released decisions. The rule is set by `AGGREGATION` in `shapebias/reproduce.py`.
+The decision rule takes, for each of the 16 categories, the largest softmax probability among that category's ImageNet classes, and picks the category with the largest value. The authors' published function averages instead (`aggregation_function=np.mean` by default), but the mean does not reproduce their released decisions: for torchvision ResNet-50, the paper's own network, the max gives the released decision on all 1,280 images and the mean on 85% of the 1,200 conflict images. The max also reproduces the torchvision AlexNet and VGG-16 figures in the texture-vs-shape README (25.3% and 9.2%). The authors' README acknowledges the difference without naming the rule: in its section on the Stylized-ImageNet models it says those values "are computed using a slightly different probability aggregation method as reported in the paper. We here used the average", and lists 21.39% for a standard ResNet-50, which is what the mean gives here. Their earlier paper ([Geirhos et al., NeurIPS 2018](https://arxiv.org/abs/1808.08750), updated appendix) used summation. No source states the max; it is identified by the exact match with the released decisions. The rule is set by `AGGREGATION` in `main.py`.
 
 ## Re-running
 
 ```
 conda env create -f environment.yml
 conda activate shape-bias
-python -m shapebias.reproduce
+python main.py
 ```
 
 This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept; the stimuli are checked against a SHA-256), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about six minutes on a laptop CPU (an Apple M4 Pro). Then
@@ -42,12 +42,13 @@ checks the decision rule against the authors' code with both aggregations, check
 
 ## Layout
 
-- `shapebias/data.py`: download, checksum and filename parsing of the stimuli.
-- `shapebias/categories.py`: the 16 categories and the decision rule.
-- `shapebias/models.py`: the networks and preprocessing.
-- `shapebias/metrics.py`: shape bias, per-category values and the probability-weighted variant.
-- `shapebias/paper.py`: reading the authors' released decisions.
-- `shapebias/plots.py`, `shapebias/reproduce.py`: the figure and the one command.
+- `main.py`: the one command; runs the steps below in order and writes `results/`.
+- `data.py`: download, checksum and filename parsing of the stimuli.
+- `categories.py`: the 16 categories and the decision rule.
+- `models.py`: the networks and preprocessing.
+- `metrics.py`: shape bias, per-category values and the probability-weighted variant.
+- `paper.py`: reading the authors' released decisions.
+- `plots.py`: the two figures.
 
 ## Licences
 

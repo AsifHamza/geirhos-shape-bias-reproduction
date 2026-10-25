@@ -12,7 +12,8 @@ import sys
 import numpy as np
 import pytest
 
-from shapebias import categories, data
+import categories
+import data
 
 AUTHORS_CODE = data.SOURCE_DIR / "code"
 
@@ -66,7 +67,7 @@ def test_matches_authors_on_model_outputs(authors_module, how):
     """The real softmax outputs, if reproduce has cached them."""
     caches = sorted((data.DATA_DIR / "softmax").glob("*.npy"))
     if not caches:
-        pytest.skip("run python -m shapebias.reproduce first")
+        pytest.skip("run python main.py first")
     mapping = authors_mapping(authors_module, how)
     for cache in caches:
         probs = np.load(cache)

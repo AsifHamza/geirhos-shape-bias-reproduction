@@ -6,7 +6,9 @@ the values printed in Figure 4.
 
 import pytest
 
-from shapebias import data, metrics, paper
+import data
+import metrics
+import paper
 
 
 @pytest.fixture(scope="module")
@@ -45,11 +47,11 @@ def test_max_reproduces_released_resnet50(stimuli):
     on every image; with mean they do not."""
     import numpy as np
 
-    from shapebias import categories
+    import categories
 
     cache = data.DATA_DIR / "softmax" / "resnet50.npy"
     if not cache.exists():
-        pytest.skip("run python -m shapebias.reproduce first")
+        pytest.skip("run python main.py first")
     names, _, _ = stimuli
     released = paper.read_decisions(paper.PAPER_MODEL_FILES["resnet50"])
     released = [released[n] for n in names]

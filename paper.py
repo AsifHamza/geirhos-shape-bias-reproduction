@@ -9,7 +9,7 @@ where our models disagree with theirs.
 
 import csv
 
-from .data import SOURCE_DIR
+from data import SOURCE_DIR
 
 RAW = SOURCE_DIR / "raw-data"
 EXPT = "style-transfer-512-nomask-experiment"

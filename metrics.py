@@ -16,7 +16,7 @@ pooling all 1,200 images; the category average is kept to match the authors.
 
 import numpy as np
 
-from .categories import CATEGORIES
+from categories import CATEGORIES
 
 
 def conflict_mask(shapes, textures):
