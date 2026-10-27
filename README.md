@@ -22,7 +22,7 @@ conda activate shape-bias
 python main.py
 ```
 
-This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept; the stimuli are checked against a SHA-256), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about five minutes on a laptop CPU (an Apple M4 Pro; 4 min 49 s and 5 min 26 s in the last two runs). Then
+This downloads the stimuli and the authors' released per-image decisions from commit `ccd0c01` of texture-vs-shape (a 163 MB archive, of which about 140 MB is kept), downloads the four torchvision weight files (about 910 MB, into torch's cache), and writes everything in `results/`. It takes about five minutes on a laptop CPU (an Apple M4 Pro; 4 min 49 s and 5 min 26 s in the last two runs). Then
 
 ```
 python -m pytest
@@ -43,7 +43,7 @@ takes about five minutes (it runs the four networks itself, with and without res
 ## Layout
 
 - `main.py`: the one command; runs the steps below in order and writes `results/`.
-- `data.py`: download, checksum and filename parsing of the stimuli.
+- `data.py`: download and filename parsing of the stimuli.
 - `categories.py`: the 16 categories and the decision rule.
 - `models.py`: the networks and preprocessing.
 - `metrics.py`: shape bias, per-category values and the probability-weighted variant.
