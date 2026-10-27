@@ -1,5 +1,4 @@
-# Downloaded stimuli, the authors' released files, and cached softmax outputs.
-# All are rebuilt by the one command.
+# Downloaded stimuli and the authors' released files, rebuilt by the one command.
 data/
 
 __pycache__/
