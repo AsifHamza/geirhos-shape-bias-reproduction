@@ -52,4 +52,4 @@ takes about five minutes (it runs the four networks itself, with and without res
 
 ## Licences
 
-The stimuli and released decisions are by Geirhos et al. under CC BY 4.0 (texture-vs-shape `DATASET_LICENSE`, downloaded alongside them). The category index lists are from model-vs-human, MIT, copyright Robert Geirhos 2021.
+The stimuli are by Geirhos et al. under CC BY 4.0 (texture-vs-shape `DATASET_LICENSE`, downloaded alongside them). The released per-image decisions of the networks and the ten human observers come from the same repository, but its licence does not cover them and the repository states no other terms; they are downloaded at run time and not redistributed here. The category index lists are from model-vs-human, MIT, copyright Robert Geirhos 2021.
